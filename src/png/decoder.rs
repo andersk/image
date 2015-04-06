@@ -242,9 +242,12 @@ impl<R: Read> PNGDecoder<R> {
             )))
         }
 
-        self.interlace_method = match FromPrimitive::from_u8(try!(try!(m.by_ref().bytes().next().ok_or(ImageError::ImageEnd)))) {
-            Some(method) => method,
-            None => return Err(ImageError::UnsupportedError(
+        const NONE_U8: u8 = InterlaceMethod::None as u8;
+        const ADAM7_U8: u8 = InterlaceMethod::Adam7 as u8;
+        self.interlace_method = match try!(try!(m.by_ref().bytes().next().ok_or(ImageError::ImageEnd))) {
+            NONE_U8 => InterlaceMethod::None,
+            ADAM7_U8 => InterlaceMethod::Adam7,
+            _ => return Err(ImageError::UnsupportedError(
                 "Unsupported interlace method.".to_string()
             ))
         };
